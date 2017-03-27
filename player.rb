@@ -2,14 +2,16 @@ class Player
   attr_accessor :name, :bank, :hand, :turn, :points
 
   def initialize(name)
-    @name =  name
+    @name = name
     @bank = 100
     @hand = []
   end
 
   def add_from_deck(deck, value)
-  value.times  { hand << deck.get_card}
-  get_points
+    raise 'Вы не можете взять карту!' if hand.size > 2
+    value.times { hand << deck.get_card }
+    get_points
+    self.turn = 'берет карты!'
   end
 
   def win
@@ -21,21 +23,25 @@ class Player
     self.points = 0
     hand.each do |card|
       value = card.chop
-      if %w(В Д К).include?(value)
-        value = 10
-      elsif value == 'Т'
-        value = ace
-      else
-        value = value.to_i
-      end
+      value = if %w(В Д К).include?(value)
+                10
+              elsif value == 'Т'
+                ace
+              else
+                value.to_i
+              end
       self.points += value
     end
+  end
+
+  def pass
+    self.turn = 'пропускает ход!'
   end
 
   private
 
   def ace
-    (points + 11) < 22 ? value = 11 : value = 1
-    value 
+    value = (points + 11) < 22 ? 11 : 1
+    value
   end
 end
